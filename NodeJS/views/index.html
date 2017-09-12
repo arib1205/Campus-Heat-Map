@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>MQTT Tracker</title>
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/normalize.css">
+	<link rel="stylesheet" href="/css/style.css">
+	<style>
+      #map {
+        height: 100%;
+      }
+	  
+	  #container, #panel, #panel1 {
+		height: 100%;
+	  }
+      
+    </style>
+	</head>
+<body>
+	<h1>NEW</h1>
+	<div class="container" id="container">
+		<div class="panel panel-default" id="panel">
+			<div class="panel-body" id="panel1">
+				<h1>MQTT Tracker</h1>
+				<p>Simple Website for tracking count 'heat maps' using MQTT</p>
+
+				<!-- Implement the graphics portion in the canvas supplied below-->
+			<div class="well" id="map" style="position: relative;height: 500px;overflow: hidden;">
+				<canvas id="grid"></canvas>
+			</div>
+		</div>
+	</div>
+	
+	<div class="panel">
+		<div class="panel-body">
+			<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#debugLog" aria-expanded="false" aria-controls="debugLog">Show Debug Log</button>
+			<div class="collapse" id="debugLog">
+				<div class="well" id="debugLogList">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+
+<script type="text/javascript" src="/js/socket.io.js"></script>
+<script type="text/javascript" src="/js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap.min.js"></script>
+<!-- Allow for custom scripts per page-->
+<script type="text/javascript">
+	var socket = io();
+	/*var b1 = 1;
+	var b2 = 1;
+	var b3 = 1;
+	var b4 = 1;*/
+	
+	// Handle socket events here
+	//--------------------------
+	// Adds to the debug list
+	socket.on('debug', data => {
+		var time = new Date();
+		$('#debugLogList').append('<div>' + time + ': ' + data.type + ' | ' + data.msg + '</div>');
+	});
+	
+	socket.on('values', data => {
+		b1 = 5;
+		beaconmap["beacon1"].count = data.beacon1;
+		beaconmap["beacon2"].count = data.beacon2;
+		beaconmap["beacon3"].count = data.beacon3;
+		beaconmap["beacon4"].count = data.beacon4;
+		/*b1 = data.beacon1;
+		b2 = data.beacon2;
+		b3 = data.beacon3;
+		b4 = data.beacon4;*/
+		initMap();	
+		var time = new Date();
+		$('#debugLogList').append('<div>' + time + ': ' + data.type + ' | ' + data.msg + '</div>');
+	
+	});
+	//--------------------------
+
+	// Handle any canvas code here-->	//----------------------------
+	//var canv = $('#grid');
+	var map;
+    
+	var beaconmap = {
+		beacon1: {
+			center: {lat: 29.648533, lng: -82.344597},
+			count: 0
+		},
+		beacon2: {
+		  center: {lat: 29.648475, lng: -82.344013},
+		  count: 0
+		},
+		beacon3: {
+		  center: {lat: 29.647720, lng: -82.343659},
+		  count: 0
+		},
+		beacon4: {
+		  center: {lat: 29.648169, lng: -82.34483},
+		  count: 0
+		}
+	};
+ 
+
+	function initMap() {
+	map = new google.maps.Map(document.getElementById('map'), {
+		center: {lat: 29.648202, lng: -82.344080},  
+		zoom: 19
+	});
+	
+	for (var beacon in beaconmap) {
+	  // Add the circle for this city to the map.
+	var beaconCircle = new google.maps.Circle({
+		strokeColor: '#FF0000',
+		strokeOpacity: 0.8,
+		strokeWeight: 2,
+		fillColor: '#FF0000',
+		fillOpacity: 0.35,
+		map: map,
+		title: beaconmap[beacon].title,
+		center: beaconmap[beacon].center,
+		radius: (beaconmap[beacon].count) 
+		});
+	}
+
+
+	
+  }			
+	//----------------------------
+
+</script>
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3gbR56mSo-V_8thQNchhmtk0q4xsHkCo&callback=initMap"
+async defer>
+	
+</script>
+
+</html>
